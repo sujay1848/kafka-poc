@@ -4,7 +4,6 @@
 package com.dfs.datahub.kafka;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -13,6 +12,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.primitives.Longs;
 
@@ -23,10 +24,11 @@ import com.google.common.primitives.Longs;
 public class ConsumerExample {
 	private final String topic;
 	private final Properties props;
+	final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public ConsumerExample(final String brokers) {
 		topic = "txn-op";
-		System.out.println("topic: " + topic);
+		logger.info("topic: {}", topic);
 		final String serializer = StringSerializer.class.getName();
 		final String deserializer = StringDeserializer.class.getName();
 		props = new Properties();
@@ -48,9 +50,9 @@ public class ConsumerExample {
 			while (true) {
 				final ConsumerRecords<String, String> records = consumer.poll(1000);
 				for (final ConsumerRecord<String, String> record : records) {
-					System.out.println(new Date().toString()
-							+ String.format(" Topic=%s Partition=%s offset=%s, key=%s, value=\"%s\"", record.topic(),
-									record.partition(), record.offset(), record.key(), Longs.fromByteArray(record.value().getBytes())));
+					logger.info("Topic={} Partition={} offset={}, key={}, value={}",
+							record.topic(), record.partition(), record.offset(), record.key(),
+							Longs.fromByteArray(record.value().getBytes()));
 				}
 			}
 		}
